@@ -10,7 +10,8 @@
       "purpose": "any"
     }
   ],
-  "start_url": "/",
+  "start_url": "/HW-Employee/",
+  "scope": "/HW-Employee/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#ffffff",
