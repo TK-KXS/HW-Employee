@@ -1017,7 +1017,7 @@ function sendMsg(){
 document.getElementById('cd-input').addEventListener('keydown',e=>{ if(e.key==='Enter') sendMsg(); });
 
 function popupCurrentPhoto(){
-  if(!currentChatId) return;
+  if(currentChatId === null) return;
   const p = PEOPLE.find(x=>x.id===currentChatId);
   openImgPopup(`Profile${currentChatId}.jpg`, p.name);
 }
