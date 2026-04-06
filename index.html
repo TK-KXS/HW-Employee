@@ -551,25 +551,25 @@ input,textarea,select,button{font-family:inherit;font-size:16px;touch-action:man
 //  DATA
 // ══════════════════════════════════════════
 const PEOPLE = [
-  {id:0, name:'Chatchawun Jongudomsombut', initials:'CJ', lastMsg:'Thank you! Please do not forget the documents in Section 3 as well.', time:'10:45', unread:0},
-  {id:1, name:'Aniwan Uthit', initials:'AU', lastMsg:'Could you please send me the updated project timeline?', time:'10:24', unread:2},
-  {id:2, name:'Tanathorn Charoenratanaporn', initials:'TC', lastMsg:'The client presentation is confirmed for 2 PM', time:'09:47', unread:0},
-  {id:3, name:'Tanatcha Devahastin', initials:'TD', lastMsg:"I've submitted the leave request, please approve when you can", time:'09:12', unread:1},
-  {id:4, name:'Sirikorn Nilkasap', initials:'SN', lastMsg:'Working from home today, available on Teams', time:'08:55', unread:0},
-  {id:5, name:'Zemin (泽民)', initials:'ZM', lastMsg:'今天下午的例会推迟到4点', time:'08:30', unread:3},
-  {id:6, name:'Zixuan (梓萱)', initials:'ZX', lastMsg:'The new module has been tested and is ready to deploy', time:'Yesterday', unread:0},
-  {id:7, name:'Zixuan (梓萱)', initials:'ZX', lastMsg:'请问您有空讨论一下这个方案吗？', time:'Yesterday', unread:1},
-  {id:8, name:'Yuxuan (宇轩)', initials:'YX', lastMsg:'技术文档已经上传到共享文件夹', time:'Yesterday', unread:0},
-  {id:9, name:'Yijun (毅君)', initials:'YJ', lastMsg:"When's the deadline for the Q2 report submission?", time:'Mon', unread:0},
-  {id:10, name:'Zimo (子墨)', initials:'ZM', lastMsg:'服务器已经恢复正常运行', time:'Mon', unread:0},
-  {id:11, name:'Jiayi (嘉懿)', initials:'JY', lastMsg:'The budget for the new project has been approved', time:'Mon', unread:0},
-  {id:12, name:'Meiling (美玲)', initials:'ML', lastMsg:'明天的培训会议请准时出席', time:'Sun', unread:0},
-  {id:13, name:'Haoran (浩然)', initials:'HR', lastMsg:'Team outing scheduled for next Friday', time:'Sun', unread:0},
-  {id:14, name:'Weicheng (伟诚)', initials:'WC', lastMsg:'请检查我发送的合同草稿并给出意见', time:'Sat', unread:0},
+  {id:1, name:'Chatchawun Jongudomsombut', initials:'CJ', lastMsg:'Thank you! Please do not forget the documents in Section 3 as well.', time:'10:45', unread:0},
+  {id:2, name:'Aniwan Uthit', initials:'AU', lastMsg:'Could you please send me the updated project timeline?', time:'10:24', unread:2},
+  {id:3, name:'Tanathorn Charoenratanaporn', initials:'TC', lastMsg:'The client presentation is confirmed for 2 PM', time:'09:47', unread:0},
+  {id:4, name:'Tanatcha Devahastin', initials:'TD', lastMsg:"I've submitted the leave request, please approve when you can", time:'09:12', unread:1},
+  {id:5, name:'Sirikorn Nilkasap', initials:'SN', lastMsg:'Working from home today, available on Teams', time:'08:55', unread:0},
+  {id:6, name:'Zemin (泽民)', initials:'ZM', lastMsg:'今天下午的例会推迟到4点', time:'08:30', unread:3},
+  {id:7, name:'Zixuan (梓萱)', initials:'ZX', lastMsg:'The new module has been tested and is ready to deploy', time:'Yesterday', unread:0},
+  {id:8, name:'Zixuan (梓萱)', initials:'ZX', lastMsg:'请问您有空讨论一下这个方案吗？', time:'Yesterday', unread:1},
+  {id:9, name:'Yuxuan (宇轩)', initials:'YX', lastMsg:'技术文档已经上传到共享文件夹', time:'Yesterday', unread:0},
+  {id:10, name:'Yijun (毅君)', initials:'YJ', lastMsg:"When's the deadline for the Q2 report submission?", time:'Mon', unread:0},
+  {id:11, name:'Zimo (子墨)', initials:'ZM', lastMsg:'服务器已经恢复正常运行', time:'Mon', unread:0},
+  {id:12, name:'Jiayi (嘉懿)', initials:'JY', lastMsg:'The budget for the new project has been approved', time:'Mon', unread:0},
+  {id:13, name:'Meiling (美玲)', initials:'ML', lastMsg:'明天的培训会议请准时出席', time:'Sun', unread:0},
+  {id:14, name:'Haoran (浩然)', initials:'HR', lastMsg:'Team outing scheduled for next Friday', time:'Sun', unread:0},
+  {id:15, name:'Weicheng (伟诚)', initials:'WC', lastMsg:'请检查我发送的合同草稿并给出意见', time:'Sat', unread:0},
 ];
 
 const CONVERSATIONS = {
-  0:[
+  1:[
     {me:false,text:"สวัสดีค่ะ",time:"Today 10:12"},
     {me:false,text:"Please complete the following task before end of day today. The link is below:",time:"Today 10:13"},
     {me:false,text:"🔗 intranet.huawei.com/portal/task/TH-2026Q1-042",time:"Today 10:13"},
@@ -578,7 +578,7 @@ const CONVERSATIONS = {
     {me:true,text:"Will complete it before 5 PM and submit.",time:"Today 10:31"},
     {me:false,text:"Thank you! Please do not forget the documents in Section 3 as well.",time:"Today 10:45"},
   ],
-  1:[
+  2:[
     {me:false,text:"Hi! Did you get a chance to look at the new project proposal I sent over yesterday?",time:"Fri 14:22"},
     {me:true,text:"Yes, I reviewed it this morning. There are a few sections that need some clarification.",time:"Fri 14:35"},
     {me:false,text:"Sure, which sections specifically?",time:"Fri 14:37"},
@@ -587,7 +587,7 @@ const CONVERSATIONS = {
     {me:true,text:"I've just updated those sections and sent the file again. Please take another look when you have a moment.",time:"Today 09:10"},
     {me:false,text:"Could you please send me the updated project timeline?",time:"Today 10:24"},
   ],
-  2:[
+  3:[
     {me:false,text:"The client called this afternoon regarding the Q2 presentation.",time:"Mon 16:00"},
     {me:true,text:"Oh? What did they say?",time:"Mon 16:03"},
     {me:false,text:"They originally wanted it on Wednesday but are requesting to move it to Thursday at 2 PM instead.",time:"Mon 16:05"},
@@ -596,7 +596,7 @@ const CONVERSATIONS = {
     {me:true,text:"Perfect. Can you also send the agenda to the client in advance?",time:"Today 08:45"},
     {me:false,text:"The client presentation is confirmed for 2 PM",time:"Today 09:47"},
   ],
-  3:[
+  4:[
     {me:false,text:"Hello, I need to take a few days off next week for a personal matter.",time:"Today 07:50"},
     {me:true,text:"Understood. Please submit the leave request through the HR system and I'll approve it.",time:"Today 08:20"},
     {me:false,text:"Which leave type should I select? Annual leave or personal leave?",time:"Today 08:25"},
@@ -604,28 +604,28 @@ const CONVERSATIONS = {
     {me:false,text:"Understood, thank you. I'll fill in the dates as Apr 13–14.",time:"Today 09:00"},
     {me:false,text:"I've submitted the leave request, please approve when you can",time:"Today 09:12"},
   ],
-  4:[
+  5:[
     {me:false,text:"Good morning. Just a heads up that I'll be working from home today.",time:"Today 08:10"},
     {me:true,text:"Noted. Do you have everything you need to work remotely?",time:"Today 08:20"},
     {me:false,text:"Yes, I have VPN access and all the files I need.",time:"Today 08:30"},
     {me:true,text:"Great. There's a team call at 3 PM today. Can you join via Teams?",time:"Today 08:45"},
     {me:false,text:"Working from home today, available on Teams",time:"Today 08:55"},
   ],
-  5:[
+  6:[
     {me:false,text:"你好！下午的周例会议程已经发到你邮箱了，请查收。",time:"Today 07:45"},
     {me:true,text:"好的，我看到了。第三项议题需要准备一下数据，我会在会议前准备好。",time:"Today 07:58"},
     {me:false,text:"好的，另外关于昨天讨论的API接口问题，技术团队还在排查中。",time:"Today 08:10"},
     {me:true,text:"预计什么时候能解决？客户那边已经催了好几次了。",time:"Today 08:15"},
     {me:false,text:"今天下午的例会推迟到4点",time:"Today 08:30"},
   ],
-  6:[
+  7:[
     {me:false,text:"The build pipeline finished about an hour ago. All unit tests passed.",time:"Yesterday 16:00"},
     {me:true,text:"That's great news. Any issues with the integration tests?",time:"Yesterday 16:10"},
     {me:false,text:"One minor issue with the auth module, but I fixed it in commit 4a8f2c. It's clean now.",time:"Yesterday 16:20"},
     {me:true,text:"Good work. I'll do a final review tonight and merge it to staging.",time:"Yesterday 16:30"},
     {me:false,text:"The new module has been tested and is ready to deploy",time:"Yesterday 17:05"},
   ],
-  7:[
+  8:[
     {me:false,text:"您好，我整理了一个关于用户体验改进的新方案，想和您讨论一下。",time:"Yesterday 14:00"},
     {me:true,text:"好的，方案的核心思路是什么？",time:"Yesterday 14:15"},
     {me:false,text:"主要是优化首页的加载速度以及简化用户注册流程，预计可以提升转化率约15%。",time:"Yesterday 14:20"},
@@ -633,42 +633,42 @@ const CONVERSATIONS = {
     {me:false,text:"基于上个季度的用户行为分析报告，具体数据在文档里都有说明。",time:"Yesterday 14:35"},
     {me:false,text:"请问您有空讨论一下这个方案吗？",time:"Yesterday 15:02"},
   ],
-  8:[
+  9:[
     {me:false,text:"Hi, the API documentation update is complete. I've covered all the new endpoints from the last sprint.",time:"Yesterday 10:30"},
     {me:true,text:"Thank you. Is the version history included?",time:"Yesterday 10:45"},
     {me:false,text:"Yes, I've documented all breaking changes since v2.1 along with migration guides.",time:"Yesterday 11:00"},
     {me:true,text:"Perfect. Please share the link in the team channel as well.",time:"Yesterday 11:10"},
     {me:false,text:"技术文档已经上传到共享文件夹",time:"Yesterday 11:30"},
   ],
-  9:[
+  10:[
     {me:true,text:"Hi Yijun, can you take the lead on the Q2 data collection this month?",time:"Mon 13:00"},
     {me:false,text:"Sure, I can do that. What format should the final report be in?",time:"Mon 13:15"},
     {me:true,text:"Same as last quarter — Excel summary plus a PDF with the executive overview.",time:"Mon 13:20"},
     {me:false,text:"Understood. I'll start gathering data from the sales and ops teams.",time:"Mon 13:25"},
     {me:false,text:"When's the deadline for the Q2 report submission?",time:"Mon 14:10"},
   ],
-  10:[
+  11:[
     {me:false,text:"运维团队刚刚确认，数据库服务器的磁盘IO问题已经排查清楚了。",time:"Mon 09:00"},
     {me:true,text:"具体是什么原因导致的？",time:"Mon 09:10"},
     {me:false,text:"是备份任务的定时调度设置不当，和业务高峰期冲突了。现已修复并重新调度。",time:"Mon 09:15"},
     {me:true,text:"好，这类问题以后要在非业务时间段进行备份。",time:"Mon 09:20"},
     {me:false,text:"服务器已经恢复正常运行",time:"Mon 09:30"},
   ],
-  11:[
+  12:[
     {me:true,text:"Hi Jiayi, any updates on the budget approval for the new cloud infrastructure?",time:"Mon 10:00"},
     {me:false,text:"I submitted the final cost breakdown to finance last Thursday. Still waiting on their sign-off.",time:"Mon 10:15"},
     {me:true,text:"Do we have a target date? The DevOps team is on standby.",time:"Mon 10:20"},
     {me:false,text:"Finance said they'd respond by end of this week at the latest.",time:"Mon 10:30"},
     {me:false,text:"The budget for the new project has been approved",time:"Mon 11:45"},
   ],
-  12:[
+  13:[
     {me:false,text:"美玲好，下周三的新员工入职培训，你来负责IT系统部分，没问题吧？",time:"Sun 14:00"},
     {me:true,text:"没问题，需要准备什么材料？",time:"Sun 14:10"},
     {me:false,text:"主要是系统账户开通流程、VPN配置和内部工具使用说明。",time:"Sun 14:15"},
     {me:true,text:"好的，我会提前准备好相关文档和演示环境。",time:"Sun 14:20"},
     {me:false,text:"明天的培训会议请准时出席",time:"Sun 15:00"},
   ],
-  13:[
+  14:[
     {me:true,text:"Hi Haoran, are you organizing the team outing this quarter?",time:"Sun 11:00"},
     {me:false,text:"Yes! I'm putting it together. We're thinking of doing a dinner and escape room activity.",time:"Sun 11:15"},
     {me:true,text:"That sounds fun. How many people are we expecting?",time:"Sun 11:20"},
@@ -676,7 +676,7 @@ const CONVERSATIONS = {
     {me:true,text:"Great. Do you need any help with reservations?",time:"Sun 11:35"},
     {me:false,text:"Team outing scheduled for next Friday",time:"Sun 12:00"},
   ],
-  14:[
+  15:[
     {me:false,text:"您好，我发了一份合作合同草稿到您邮箱，麻烦有空帮我看一下。",time:"Sat 10:00"},
     {me:true,text:"好的，主要看什么方面？",time:"Sat 10:20"},
     {me:false,text:"主要是第四条关于违约责任的表述，还有第七条的保密期限，不太确定措辞是否准确。",time:"Sat 10:25"},
@@ -835,24 +835,24 @@ IT Security Team<br>Huawei Technologies`
 // ══════════════════════════════════════════
 //  CHAT ENHANCEMENTS DATA
 // ══════════════════════════════════════════
-const ONLINE_IDS = new Set([0,1,3,5,6,8,11,13]);
-const LAST_SEEN = {2:'Last seen 1h ago',4:'Last seen 30m ago',7:'Last seen 3h ago',9:'Last seen 2h ago',10:'Last seen yesterday',12:'Last seen yesterday',14:'Last seen 4h ago'};
+const ONLINE_IDS = new Set([1,2,4,6,7,9,12,14]);
+const LAST_SEEN = {3:'Last seen 1h ago',5:'Last seen 30m ago',8:'Last seen 3h ago',10:'Last seen 2h ago',11:'Last seen yesterday',13:'Last seen yesterday',15:'Last seen 4h ago'};
 const AUTO_REPLIES = {
-  0:"ค่ะ ขอบคุณนะคะ! Let me know once you have submitted. 🙏",
-  1:"Sure, I'll send that right away. Give me a moment.",
-  2:"Great, thanks for confirming. I'll prepare everything.",
-  3:"Thank you so much! Really appreciate it.",
-  4:"Perfect, I'll be on the call. See you then!",
-  5:"好的，收到了，谢谢！",
-  6:"Sounds good, thanks for checking in.",
-  7:"好的，期待您的回复！",
-  8:"Noted, thank you for the update.",
-  9:"Got it. I'll make sure to have it ready on time.",
-  10:"好的，明白了，谢谢！",
-  11:"Thanks! I'll follow up on that.",
-  12:"收到，谢谢提醒！",
-  13:"Awesome, looking forward to it!",
-  14:"好的，感谢！期待您的宝贵意见。",
+  1:"ค่ะ ขอบคุณนะคะ! Let me know once you have submitted. 🙏",
+  2:"Sure, I'll send that right away. Give me a moment.",
+  3:"Great, thanks for confirming. I'll prepare everything.",
+  4:"Thank you so much! Really appreciate it.",
+  5:"Perfect, I'll be on the call. See you then!",
+  6:"好的，收到了，谢谢！",
+  7:"Sounds good, thanks for checking in.",
+  8:"好的，期待您的回复！",
+  9:"Noted, thank you for the update.",
+  10:"Got it. I'll make sure to have it ready on time.",
+  11:"好的，明白了，谢谢！",
+  12:"Thanks! I'll follow up on that.",
+  13:"收到，谢谢提醒！",
+  14:"Awesome, looking forward to it!",
+  15:"好的，感谢！期待您的宝贵意见。",
 };
 
 // ══════════════════════════════════════════
