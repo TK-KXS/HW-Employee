@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="HW App">
+<link rel="apple-touch-icon" sizes="1024x1024" href="icon.png">
+<link rel="manifest" href="manifest.json">
+<title>HW App</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:none;text-size-adjust:none;}
+html,body{width:100%;height:100%;overflow:hidden;background:#fff;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',Arial,sans-serif;touch-action:manipulation;-webkit-user-select:none;user-select:none;}
+input,textarea,select,button{font-family:inherit;font-size:16px;touch-action:manipulation;outline:none;}
+
+/* ─── LOADING ─── */
+#loading{position:fixed;inset:0;background:#fff;display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity .3s ease;}
+#loading.out{opacity:0;pointer-events:none;}
+#loading.gone{display:none;}
+#loading img{width:110px;height:110px;object-fit:contain;}
+
+/* ─── APP SHELL ─── */
+#app{position:fixed;inset:0;display:flex;flex-direction:column;background:#fff;overflow:hidden;}
+
+/* ─── HEADER ─── */
+#header{
+  background:#CF082D;
+  padding-top:env(safe-area-inset-top,44px);
+  padding-left:20px;padding-right:20px;
+  min-height:calc(44px + env(safe-area-inset-top,44px));
+  display:flex;align-items:flex-end;padding-bottom:12px;
+  flex-shrink:0;
+  position:relative;
+}
+#header-title{color:#fff;font-size:17px;font-weight:600;letter-spacing:.3px;}
+#header-back{display:none;align-items:center;gap:6px;color:#fff;font-size:15px;font-weight:500;cursor:pointer;position:absolute;left:16px;bottom:12px;}
+#header-back svg{width:10px;height:16px;}
+#header-action{position:absolute;right:16px;bottom:12px;color:#fff;font-size:14px;font-weight:500;cursor:pointer;}
+
+/* ─── PAGES ─── */
+#pages{flex:1;overflow:hidden;position:relative;}
+.page{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;background:#fff;display:none;}
+.page.active{display:block;}
+
+/* ─── BOTTOM NAV ─── */
+#nav{
+  background:#fff;
+  border-top:1px solid #e8e8e8;
+  display:flex;
+  flex-shrink:0;
+}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px 4px;cursor:pointer;gap:4px;transition:opacity .15s;}
+.nav-btn svg{width:24px;height:24px;}
+.nav-btn span{font-size:10px;font-weight:500;color:#999;}
+.nav-btn.active span{color:#CF082D;}
+.nav-btn.active svg path,.nav-btn.active svg rect,.nav-btn.active svg circle,.nav-btn.active svg polyline{stroke:#CF082D;}
+.nav-btn.active svg.fill path{fill:#CF082D;stroke:none;}
+
+/* ─── CHAT LIST ─── */
+.chat-item{display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid #f0f0f0;cursor:pointer;}
+.chat-item:active{background:#f9f9f9;}
+.avatar-wrap{position:relative;flex-shrink:0;}
+.avatar{width:52px;height:52px;border-radius:50%;object-fit:cover;background:#e8e8e8;}
+.avatar-fallback{width:52px;height:52px;border-radius:50%;background:#1a1a1a;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:600;flex-shrink:0;}
+.badge{position:absolute;top:-2px;right:-2px;background:#CF082D;color:#fff;border-radius:50%;width:18px;height:18px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff;}
+.chat-info{flex:1;min-width:0;margin-left:12px;}
+.chat-name{font-size:15px;font-weight:600;color:#000;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.chat-preview{font-size:13px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.chat-time{font-size:12px;color:#bbb;flex-shrink:0;margin-left:8px;}
+
+/* ─── CHAT DETAIL ─── */
+#chat-detail{position:fixed;inset:0;background:#fff;z-index:100;display:none;flex-direction:column;}
+#chat-detail.open{display:flex;}
+#chat-detail-header{
+  background:#CF082D;
+  padding-top:env(safe-area-inset-top,44px);
+  padding-left:16px;padding-right:16px;padding-bottom:12px;
+  display:flex;align-items:flex-end;gap:12px;flex-shrink:0;
+}
+#cd-back{color:#fff;cursor:pointer;display:flex;align-items:center;gap:4px;font-size:15px;font-weight:500;}
+#cd-back svg{width:10px;height:16px;}
+.cd-avatar-wrap{cursor:pointer;}
+.cd-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.5);}
+.cd-avatar-fallback{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700;cursor:pointer;}
+#cd-name{flex:1;color:#fff;font-size:16px;font-weight:600;}
+#cd-messages{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px;display:flex;flex-direction:column;gap:10px;background:#f7f7f7;}
+.msg{max-width:72%;display:flex;flex-direction:column;}
+.msg.me{align-self:flex-end;align-items:flex-end;}
+.msg.them{align-self:flex-start;align-items:flex-start;}
+.msg-bubble{padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.45;}
+.msg.me .msg-bubble{background:#CF082D;color:#fff;border-bottom-right-radius:4px;}
+.msg.them .msg-bubble{background:#fff;color:#000;border-bottom-left-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.08);}
+.msg-time{font-size:11px;color:#aaa;margin-top:3px;padding:0 4px;}
+#cd-input-bar{background:#fff;border-top:1px solid #e8e8e8;padding:10px 16px;padding-bottom:calc(10px + env(safe-area-inset-bottom,20px));display:flex;align-items:center;gap:10px;flex-shrink:0;}
+#cd-input{flex:1;background:#f0f0f0;border:none;border-radius:20px;padding:10px 16px;font-size:14px;color:#000;}
+#cd-send{background:#CF082D;border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+#cd-send svg{width:16px;height:16px;}
+
+/* ─── IMAGE POPUP ─── */
+#img-popup{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:200;display:none;flex-direction:column;align-items:center;justify-content:center;}
+#img-popup.open{display:flex;}
+#img-popup img{width:80%;max-width:320px;border-radius:16px;object-fit:cover;}
+#img-popup-name{color:#fff;margin-top:16px;font-size:15px;font-weight:500;}
+#img-popup-close{position:absolute;top:calc(16px + env(safe-area-inset-top,44px));right:20px;color:#fff;font-size:28px;cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;}
+
+/* ─── CLOCK PAGE ─── */
+.clock-status{text-align:center;padding:32px 24px 24px;}
+.clock-status-label{font-size:13px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.clock-time-now{font-size:48px;font-weight:200;color:#000;letter-spacing:-1px;font-variant-numeric:tabular-nums;}
+.clock-date-now{font-size:14px;color:#888;margin-top:4px;}
+.clock-btn-wrap{display:flex;justify-content:center;padding:16px 0 32px;}
+.clock-btn{width:140px;height:140px;border-radius:50%;border:3px solid #CF082D;background:#fff;font-size:15px;font-weight:700;color:#CF082D;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-shadow:0 4px 20px rgba(207,8,45,.15);transition:all .15s;}
+.clock-btn:active{transform:scale(.96);}
+.clock-btn svg{width:28px;height:28px;margin-bottom:4px;}
+.clock-section-title{font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.8px;padding:16px 20px 8px;}
+.history-item{padding:16px 20px;border-bottom:1px solid #f0f0f0;}
+.history-date{font-size:13px;font-weight:700;color:#000;margin-bottom:8px;}
+.history-row{display:flex;justify-content:space-between;gap:16px;}
+.history-col{display:flex;align-items:center;gap:8px;}
+.history-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.history-dot.in{background:#00aa55;}
+.history-dot.out{background:#CF082D;}
+.history-label{font-size:12px;color:#888;}
+.history-val{font-size:14px;font-weight:600;color:#000;font-variant-numeric:tabular-nums;}
+
+/* ─── WARNING POPUP ─── */
+#warn-popup{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;display:none;align-items:center;justify-content:center;padding:32px;}
+#warn-popup.open{display:flex;}
+.warn-box{background:#fff;border-radius:16px;padding:28px 24px;width:100%;max-width:320px;text-align:center;}
+.warn-icon{width:56px;height:56px;background:#CF082D;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+.warn-icon svg{width:28px;height:28px;}
+.warn-title{font-size:17px;font-weight:700;color:#000;margin-bottom:10px;}
+.warn-msg{font-size:14px;color:#555;line-height:1.5;margin-bottom:24px;}
+.warn-btn{background:#CF082D;color:#fff;border:none;border-radius:12px;padding:14px;width:100%;font-size:15px;font-weight:600;cursor:pointer;}
+
+/* ─── ID CARD PAGE ─── */
+#id-page{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;}
+.id-display{width:100%;padding:24px;display:flex;align-items:center;justify-content:center;}
+.id-display img{width:100%;max-width:380px;border-radius:16px;object-fit:contain;box-shadow:0 4px 24px rgba(0,0,0,.1);}
+.id-btn-row{display:flex;gap:12px;padding:0 24px 20px;width:100%;justify-content:center;}
+.id-btn{flex:1;max-width:160px;border:2px solid #CF082D;border-radius:12px;padding:12px;text-align:center;cursor:pointer;font-size:14px;font-weight:600;transition:all .15s;}
+.id-btn.active{background:#CF082D;color:#fff;}
+.id-btn:not(.active){background:#fff;color:#CF082D;}
+.id-timer{font-size:13px;color:#CF082D;text-align:center;padding:0 0 12px;font-variant-numeric:tabular-nums;}
+
+/* ─── ONLINE / OFFLINE DOT ─── */
+.online-dot{position:absolute;bottom:1px;right:1px;width:13px;height:13px;border-radius:50%;background:#34c759;border:2.5px solid #fff;}
+.offline-dot{position:absolute;bottom:1px;right:1px;width:13px;height:13px;border-radius:50%;background:#c8c8c8;border:2.5px solid #fff;}
+
+/* ─── CHAT DETAIL STATUS ─── */
+#cd-name-col{flex:1;min-width:0;}
+#cd-name{color:#fff;font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#cd-status{font-size:11px;color:rgba(255,255,255,.78);margin-top:1px;display:flex;align-items:center;gap:4px;}
+
+/* ─── TYPING INDICATOR ─── */
+.typing-bubble{display:inline-flex;gap:5px;align-items:center;padding:13px 16px;background:#fff;border-radius:18px;border-bottom-left-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.08);}
+.typing-dot{width:7px;height:7px;border-radius:50%;background:#bbb;animation:typingBounce 1.2s infinite ease-in-out;}
+.typing-dot:nth-child(2){animation-delay:.2s;}
+.typing-dot:nth-child(3){animation-delay:.4s;}
+@keyframes typingBounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-6px);}}
+
+/* ─── READ RECEIPTS ─── */
+.msg-receipt{color:#ccc;font-size:11px;letter-spacing:-1px;}
+.msg-receipt.read{color:rgba(255,255,255,.7);}
+
+/* ─── DATE SEPARATOR ─── */
+.date-sep{display:flex;align-items:center;gap:8px;margin:8px 0;}
+.date-sep span{font-size:11px;color:#aaa;white-space:nowrap;padding:0 4px;}
+.date-sep::before,.date-sep::after{content:'';flex:1;height:1px;background:#e2e2e2;}
+
+/* ─── ID SECURITY BADGE ─── */
+.id-security{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:#f0faf0;border-radius:20px;border:1px solid #c8e6c9;margin-bottom:20px;}
+.id-security svg{width:14px;height:14px;flex-shrink:0;}
+.id-security span{font-size:11px;color:#2e7d32;font-weight:600;letter-spacing:.1px;}
+
+/* ─── ID IMG FLIP ─── */
+#id-img{width:100%;max-width:360px;border-radius:16px;box-shadow:0 4px 28px rgba(0,0,0,.13);object-fit:contain;display:block;transition:transform .25s cubic-bezier(.4,0,.2,1);}
+#id-img.flipping{transform:rotateY(90deg);}
+
+/* ─── QR TIMER LABEL ─── */
+.id-qr-timer-text{font-size:10px;color:#bbb;text-align:center;margin-bottom:8px;}
+.id-qr-timer-text strong{color:#CF082D;font-variant-numeric:tabular-nums;}
+
+/* ─── ID BTN WITH ICON ─── */
+.id-btn{display:flex;align-items:center;justify-content:center;gap:5px;}
+
+/* ─── MAIL ─── */
+.mail-item{padding:14px 20px;border-bottom:1px solid #f0f0f0;cursor:pointer;display:flex;gap:14px;align-items:flex-start;}
+.mail-item:active{background:#f9f9f9;}
+.mail-avatar-circle{width:40px;height:40px;border-radius:50%;background:#000;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:700;}
+.mail-info{flex:1;min-width:0;}
+.mail-from{font-size:14px;font-weight:700;color:#000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mail-from.unread{font-weight:800;}
+.mail-subject{font-size:13px;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
+.mail-preview{font-size:12px;color:#aaa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
+.mail-right{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
+.mail-time{font-size:12px;color:#bbb;}
+.mail-dot{width:9px;height:9px;border-radius:50%;background:#CF082D;}
+#mail-compose-btn{position:fixed;right:24px;bottom:80px;width:56px;height:56px;background:#CF082D;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(207,8,45,.35);cursor:pointer;z-index:50;}
+#mail-compose-btn svg{width:24px;height:24px;}
+
+/* ─── MAIL DETAIL ─── */
+#mail-detail{position:fixed;inset:0;background:#fff;z-index:100;display:none;flex-direction:column;}
+#mail-detail.open{display:flex;}
+#mail-detail-header{background:#CF082D;padding-top:env(safe-area-inset-top,44px);padding-left:16px;padding-right:16px;padding-bottom:14px;display:flex;align-items:flex-end;gap:12px;flex-shrink:0;}
+#md-back{color:#fff;cursor:pointer;display:flex;align-items:center;gap:4px;font-size:15px;font-weight:500;}
+#md-back svg{width:10px;height:16px;}
+#md-title-col{flex:1;min-width:0;}
+#md-subject{font-size:15px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#md-from-line{font-size:12px;color:rgba(255,255,255,.75);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#mail-detail-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:20px;}
+.md-sender-row{display:flex;gap:12px;align-items:center;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #f0f0f0;}
+.md-sender-avatar{width:44px;height:44px;border-radius:50%;background:#000;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:700;flex-shrink:0;}
+.md-sender-info{}
+.md-sender-name{font-size:14px;font-weight:700;color:#000;}
+.md-sender-email{font-size:12px;color:#888;}
+.md-body{font-size:14px;color:#222;line-height:1.65;}
+
+/* ─── MAIL COMPOSE ─── */
+#mail-compose{position:fixed;inset:0;background:#fff;z-index:150;display:none;flex-direction:column;}
+#mail-compose.open{display:flex;}
+#mc-header{background:#CF082D;padding-top:env(safe-area-inset-top,44px);padding-left:16px;padding-right:16px;padding-bottom:14px;display:flex;align-items:flex-end;justify-content:space-between;flex-shrink:0;}
+#mc-header span{color:#fff;font-size:17px;font-weight:600;}
+#mc-close{color:#fff;cursor:pointer;font-size:24px;line-height:1;}
+#mc-send-btn{color:#fff;font-size:15px;font-weight:600;cursor:pointer;}
+.mc-field{border-bottom:1px solid #f0f0f0;padding:14px 20px;display:flex;align-items:center;gap:10px;}
+.mc-label{font-size:13px;color:#888;width:36px;flex-shrink:0;}
+.mc-input{flex:1;border:none;font-size:14px;color:#000;background:transparent;}
+#mc-body-input{flex:1;padding:16px 20px;border:none;font-size:14px;color:#000;resize:none;background:transparent;height:200px;}
+
+/* ─── HR PAGE ─── */
+.hr-section{padding:20px 20px 0;}
+.hr-section-title{font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;}
+.hr-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.hr-card{background:#fff;border:1.5px solid #e8e8e8;border-radius:14px;padding:18px 14px;display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:all .15s;}
+.hr-card:active{background:#f9f9f9;transform:scale(.98);}
+.hr-card-icon{width:36px;height:36px;background:#CF082D;border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.hr-card-icon svg{width:20px;height:20px;}
+.hr-card-title{font-size:13px;font-weight:700;color:#000;}
+.hr-card-sub{font-size:11px;color:#888;line-height:1.4;}
+.hr-balance-row{display:flex;gap:10px;margin-bottom:20px;}
+.hr-balance-card{flex:1;border-radius:14px;border:1.5px solid #e8e8e8;padding:16px 14px;}
+.hr-balance-val{font-size:24px;font-weight:700;color:#CF082D;}
+.hr-balance-label{font-size:11px;color:#888;margin-top:2px;}
+.hr-recent-title{font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.8px;padding:0 20px 10px;}
+.hr-recent-item{padding:14px 20px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;}
+.hr-recent-left{}
+.hr-recent-type{font-size:14px;font-weight:600;color:#000;}
+.hr-recent-date{font-size:12px;color:#888;margin-top:2px;}
+.hr-status{font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;}
+.hr-status.approved{background:#e8f5e9;color:#2e7d32;}
+.hr-status.pending{background:#fff3e0;color:#e65100;}
+
+/* ─── HR MODAL (sheet) ─── */
+#hr-sheet{position:fixed;inset:0;z-index:200;display:none;flex-direction:column;justify-content:flex-end;}
+#hr-sheet.open{display:flex;}
+#hr-sheet-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.5);}
+#hr-sheet-content{position:relative;background:#fff;border-radius:24px 24px 0 0;padding:0 0 calc(24px + env(safe-area-inset-bottom,20px));max-height:85vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+#hr-sheet-handle{width:40px;height:4px;background:#e0e0e0;border-radius:2px;margin:12px auto 0;}
+#hr-sheet-title{font-size:17px;font-weight:700;color:#000;padding:16px 20px 0;}
+#hr-sheet-close{position:absolute;top:14px;right:16px;font-size:22px;color:#888;cursor:pointer;}
+.sheet-field{padding:12px 20px;border-bottom:1px solid #f5f5f5;}
+.sheet-field label{font-size:12px;color:#888;display:block;margin-bottom:6px;font-weight:500;}
+.sheet-field select,.sheet-field input,.sheet-field textarea{width:100%;border:1.5px solid #e8e8e8;border-radius:10px;padding:11px 14px;font-size:14px;color:#000;background:#fff;-webkit-appearance:none;appearance:none;}
+.sheet-field textarea{height:80px;resize:none;}
+.sheet-submit{margin:20px 20px 0;background:#CF082D;color:#fff;border:none;border-radius:14px;padding:16px;width:calc(100% - 40px);font-size:15px;font-weight:700;cursor:pointer;}
+
+/* ─── TOAST ─── */
+#toast{position:fixed;bottom:calc(100px + env(safe-area-inset-bottom,20px));left:50%;transform:translateX(-50%);background:#000;color:#fff;padding:12px 24px;border-radius:24px;font-size:14px;font-weight:500;z-index:400;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap;}
+#toast.show{opacity:1;}
+
+/* ─── SCROLLBAR HIDE ─── */
+.page::-webkit-scrollbar,#cd-messages::-webkit-scrollbar,#mail-detail-body::-webkit-scrollbar,#hr-sheet-content::-webkit-scrollbar{display:none;}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loading">
+  <img src="LOGO.PNG" alt="Logo">
+</div>
+
+<!-- APP -->
+<div id="app">
+
+  <!-- HEADER -->
+  <div id="header">
+    <div id="header-back" onclick="headerBack()">
+      <svg viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 1L1.5 8L9 15" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back
+    </div>
+    <div id="header-title">Chat</div>
+    <div id="header-action"></div>
+  </div>
+
+  <!-- PAGES -->
+  <div id="pages">
+
+    <!-- ╔══════════════ CHAT PAGE ══════════════╗ -->
+    <div class="page active" id="page-chat">
+      <div id="chat-list"></div>
+    </div>
+
+    <!-- ╔══════════════ CLOCK PAGE ══════════════╗ -->
+    <div class="page" id="page-clock">
+      <div class="clock-status">
+        <div class="clock-status-label">Current Time</div>
+        <div class="clock-time-now" id="live-time">--:--:--</div>
+        <div class="clock-date-now" id="live-date">--</div>
+      </div>
+      <div class="clock-btn-wrap">
+        <button class="clock-btn" onclick="doClockAction()">
+          <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="14" cy="14" r="11" stroke="#CF082D" stroke-width="2"/>
+            <path d="M14 8v6l4 2" stroke="#CF082D" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span style="font-size:15px;font-weight:700;color:#CF082D;">Clock In / Out</span>
+        </button>
+      </div>
+      <div class="clock-section-title">Attendance History</div>
+      <div class="history-item">
+        <div class="history-date">Tuesday, 7 April 2026</div>
+        <div class="history-row">
+          <div class="history-col"><div class="history-dot in"></div><div><div class="history-label">Clock In</div><div class="history-val">08:10:31</div></div></div>
+          <div class="history-col"><div class="history-dot out"></div><div><div class="history-label">Clock Out</div><div class="history-val">18:04:09</div></div></div>
+        </div>
+      </div>
+      <div class="history-item">
+        <div class="history-date">Friday, 3 April 2026</div>
+        <div class="history-row">
+          <div class="history-col"><div class="history-dot in"></div><div><div class="history-label">Clock In</div><div class="history-val">08:12:44</div></div></div>
+          <div class="history-col"><div class="history-dot out"></div><div><div class="history-label">Clock Out</div><div class="history-val">18:01:52</div></div></div>
+        </div>
+      </div>
+      <div class="history-item">
+        <div class="history-date">Thursday, 2 April 2026</div>
+        <div class="history-row">
+          <div class="history-col"><div class="history-dot in"></div><div><div class="history-label">Clock In</div><div class="history-val">08:10:05</div></div></div>
+          <div class="history-col"><div class="history-dot out"></div><div><div class="history-label">Clock Out</div><div class="history-val">18:03:18</div></div></div>
+        </div>
+      </div>
+      <div class="history-item">
+        <div class="history-date">Wednesday, 1 April 2026</div>
+        <div class="history-row">
+          <div class="history-col"><div class="history-dot in"></div><div><div class="history-label">Clock In</div><div class="history-val">08:11:23</div></div></div>
+          <div class="history-col"><div class="history-dot out"></div><div><div class="history-label">Clock Out</div><div class="history-val">18:02:47</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔══════════════ ID PAGE ══════════════╗ -->
+    <div class="page" id="page-id">
+      <div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;">
+        <div class="id-security">
+          <svg viewBox="0 0 14 14" fill="none"><path d="M7 1l5 2v4c0 3.2-5 6-5 6S2 10.2 2 7V3l5-2z" fill="#2e7d32"/><path d="M4.5 7l2 2 3-3" stroke="#fff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Verified Employee · Huawei Technologies</span>
+        </div>
+        <div style="width:100%;display:flex;justify-content:center;margin-bottom:20px;">
+          <img id="id-img" src="CARD.JPG" alt="ID Card">
+        </div>
+        <div id="id-timer-display" style="display:none;" class="id-qr-timer-text">Auto-switching in&nbsp;<strong id="id-countdown">0:30</strong></div>
+        <div class="id-btn-row">
+          <div class="id-btn active" id="id-btn-card" onclick="switchID('card')">
+            <svg viewBox="0 0 18 13" fill="none" style="width:16px;height:12px;"><rect x="1" y="1" width="16" height="11" rx="1.5" stroke="currentColor" stroke-width="1.4"/><circle cx="5.5" cy="6" r="1.8" fill="currentColor"/><path d="M9.5 4.5h5M9.5 7.5h3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+            ID Card
+          </div>
+          <div class="id-btn" id="id-btn-qr" onclick="switchID('qr')">
+            <svg viewBox="0 0 14 14" fill="none" style="width:14px;height:14px;"><rect x="1" y="1" width="5" height="5" rx=".5" stroke="currentColor" stroke-width="1.3"/><rect x="8" y="1" width="5" height="5" rx=".5" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="8" width="5" height="5" rx=".5" stroke="currentColor" stroke-width="1.3"/><rect x="9.25" y="9.25" width="1.5" height="1.5" fill="currentColor"/><path d="M11.5 9h1.5v1.5M13 11.5v1.5M11.5 13h-1.5v-1.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
+            QR Code
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔══════════════ MAIL PAGE ══════════════╗ -->
+    <div class="page" id="page-mail">
+      <div style="padding:12px 20px 8px;font-size:13px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.8px;">Inbox</div>
+      <div id="mail-list"></div>
+      <div style="height:80px;"></div>
+    </div>
+
+    <!-- ╔══════════════ HR PAGE ══════════════╗ -->
+    <div class="page" id="page-hr">
+      <div class="hr-section">
+        <div class="hr-section-title">Leave Balance</div>
+        <div class="hr-balance-row">
+          <div class="hr-balance-card"><div class="hr-balance-val">12</div><div class="hr-balance-label">Annual Leave<br>Days Remaining</div></div>
+          <div class="hr-balance-card"><div class="hr-balance-val">30</div><div class="hr-balance-label">Sick Leave<br>Days Remaining</div></div>
+          <div class="hr-balance-card"><div class="hr-balance-val">3</div><div class="hr-balance-label">Personal Leave<br>Days Remaining</div></div>
+        </div>
+        <div class="hr-section-title">Quick Actions</div>
+        <div class="hr-card-grid">
+          <div class="hr-card" onclick="openHRSheet('leave')">
+            <div class="hr-card-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="14" rx="2" stroke="#fff" stroke-width="1.5"/><path d="M7 2v4M13 2v4M3 9h14" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div class="hr-card-title">Leave Request</div>
+            <div class="hr-card-sub">Apply for annual, sick or personal leave</div>
+          </div>
+          <div class="hr-card" onclick="openHRSheet('room')">
+            <div class="hr-card-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="5" width="14" height="12" rx="2" stroke="#fff" stroke-width="1.5"/><path d="M7 5V3.5M13 5V3.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><path d="M8 10h4M10 8v4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div class="hr-card-title">Meeting Room</div>
+            <div class="hr-card-sub">Reserve a conference room in G-TOWER</div>
+          </div>
+          <div class="hr-card" onclick="openHRSheet('overtime')">
+            <div class="hr-card-icon"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#fff" stroke-width="1.5"/><path d="M10 6v4l2.5 2.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div class="hr-card-title">Overtime</div>
+            <div class="hr-card-sub">Submit overtime work request</div>
+          </div>
+          <div class="hr-card" onclick="openHRSheet('payslip')">
+            <div class="hr-card-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="4" y="3" width="12" height="15" rx="2" stroke="#fff" stroke-width="1.5"/><path d="M7 8h6M7 11h4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div class="hr-card-title">Pay Slip</div>
+            <div class="hr-card-sub">View and download payslips</div>
+          </div>
+        </div>
+      </div>
+      <div class="hr-recent-title">Recent Requests</div>
+      <div class="hr-recent-item"><div class="hr-recent-left"><div class="hr-recent-type">Annual Leave</div><div class="hr-recent-date">Mar 20 – Mar 21, 2026</div></div><div class="hr-status approved">Approved</div></div>
+      <div class="hr-recent-item"><div class="hr-recent-left"><div class="hr-recent-type">Meeting Room · G-TOWER-F3-R2</div><div class="hr-recent-date">Apr 7, 2026 · 14:00–16:00</div></div><div class="hr-status approved">Approved</div></div>
+      <div class="hr-recent-item"><div class="hr-recent-left"><div class="hr-recent-type">Sick Leave</div><div class="hr-recent-date">Mar 5, 2026</div></div><div class="hr-status approved">Approved</div></div>
+      <div class="hr-recent-item"><div class="hr-recent-left"><div class="hr-recent-type">Overtime Request</div><div class="hr-recent-date">Mar 28, 2026 · 3 hours</div></div><div class="hr-status pending">Pending</div></div>
+      <div style="height:24px;"></div>
+    </div>
+
+  </div><!-- /pages -->
+
+  <!-- BOTTOM NAV -->
+  <div id="nav">
+    <div class="nav-btn active" id="nav-chat" onclick="switchTab('chat')">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="#CF082D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Chat</span>
+    </div>
+    <div class="nav-btn" id="nav-clock" onclick="switchTab('clock')">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke="#999" stroke-width="1.8"/><path d="M12 7v5l3 3" stroke="#999" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>Clock</span>
+    </div>
+    <div class="nav-btn" id="nav-id" onclick="switchTab('id')">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="6" width="18" height="13" rx="2.5" stroke="#999" stroke-width="1.8"/><circle cx="9" cy="12" r="2" stroke="#999" stroke-width="1.5"/><path d="M14 10h4M14 13h3" stroke="#999" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <span>ID Card</span>
+    </div>
+    <div class="nav-btn" id="nav-mail" onclick="switchTab('mail')">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="5" width="18" height="14" rx="2" stroke="#999" stroke-width="1.8"/><path d="M3 8l9 6 9-6" stroke="#999" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>Mail</span>
+    </div>
+    <div class="nav-btn" id="nav-hr" onclick="switchTab('hr')">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="8" r="3" stroke="#999" stroke-width="1.8"/><path d="M5 20c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="#999" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>HR</span>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- ─── CHAT DETAIL ─── -->
+<div id="chat-detail">
+  <div id="chat-detail-header">
+    <div id="cd-back" onclick="closeChatDetail()">
+      <svg viewBox="0 0 10 16" fill="none"><path d="M9 1L1.5 8L9 15" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back
+    </div>
+    <div class="cd-avatar-wrap" id="cd-avatar-tap" onclick="popupCurrentPhoto()">
+      <img id="cd-avatar-img" class="cd-avatar" src="" alt="" onerror="this.style.display='none'">
+    </div>
+    <div id="cd-name-col">
+      <div id="cd-name">Name</div>
+      <div id="cd-status"></div>
+    </div>
+  </div>
+  <div id="cd-messages"></div>
+  <div id="cd-input-bar">
+    <input id="cd-input" type="text" placeholder="Message…" maxlength="200">
+    <button id="cd-send" onclick="sendMsg()">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M14 8L2 2l3 6-3 6 12-6z" fill="#fff"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ─── IMAGE POPUP ─── -->
+<div id="img-popup" onclick="closeImgPopup()">
+  <div id="img-popup-close">✕</div>
+  <img id="img-popup-img" src="" alt="">
+  <div id="img-popup-name"></div>
+</div>
+
+<!-- ─── CLOCK WARNING ─── -->
+<div id="warn-popup">
+  <div class="warn-box">
+    <div class="warn-icon"><svg viewBox="0 0 28 28" fill="none"><path d="M14 6L3 23h22L14 6z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M14 13v5M14 20v1.5" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></div>
+    <div class="warn-title">Out of Office Area</div>
+    <div class="warn-msg">You are currently outside the designated office location. Clock in/out is only permitted within the office premises.</div>
+    <button class="warn-btn" onclick="closeWarn()">Understood</button>
+  </div>
+</div>
+
+<!-- ─── MAIL DETAIL ─── -->
+<div id="mail-detail">
+  <div id="mail-detail-header">
+    <div id="md-back" onclick="closeMailDetail()">
+      <svg viewBox="0 0 10 16" fill="none"><path d="M9 1L1.5 8L9 15" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back
+    </div>
+    <div id="md-title-col">
+      <div id="md-subject"></div>
+      <div id="md-from-line"></div>
+    </div>
+  </div>
+  <div id="mail-detail-body">
+    <div class="md-sender-row">
+      <div class="md-sender-avatar" id="md-sender-avatar"></div>
+      <div class="md-sender-info">
+        <div class="md-sender-name" id="md-sender-name"></div>
+        <div class="md-sender-email" id="md-sender-email"></div>
+      </div>
+    </div>
+    <div class="md-body" id="md-body"></div>
+  </div>
+</div>
+
+<!-- ─── MAIL COMPOSE ─── -->
+<div id="mail-compose">
+  <div id="mc-header">
+    <div id="mc-close" onclick="closeMC()">✕</div>
+    <span>New Message</span>
+    <div id="mc-send-btn" onclick="sendMC()">Send</div>
+  </div>
+  <div class="mc-field"><span class="mc-label">To</span><input class="mc-input" id="mc-to" type="email" placeholder="recipient@huawei.com"></div>
+  <div class="mc-field"><span class="mc-label">Subj</span><input class="mc-input" id="mc-subj" type="text" placeholder="Subject"></div>
+  <textarea id="mc-body-input" placeholder="Write your message…"></textarea>
+</div>
+
+<!-- ─── HR SHEET ─── -->
+<div id="hr-sheet">
+  <div id="hr-sheet-backdrop" onclick="closeHRSheet()"></div>
+  <div id="hr-sheet-content">
+    <div id="hr-sheet-handle"></div>
+    <div id="hr-sheet-close" onclick="closeHRSheet()">✕</div>
+    <div id="hr-sheet-title">Request</div>
+    <div id="hr-sheet-body"></div>
+    <button class="sheet-submit" onclick="submitHR()">Submit Request</button>
+  </div>
+</div>
+
+<!-- ─── COMPOSE FAB (mail) ─── -->
+<div id="mail-compose-btn" style="display:none;" onclick="openMC()">
+  <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>
+</div>
+
+<!-- ─── TOAST ─── -->
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════
+const PEOPLE = [
+  {id:0, name:'Chatchawun Jongudomsombut', initials:'CJ', lastMsg:'Thank you! Please do not forget the documents in Section 3 as well.', time:'10:45', unread:0},
+  {id:1, name:'Aniwan Uthit', initials:'AU', lastMsg:'Could you please send me the updated project timeline?', time:'10:24', unread:2},
+  {id:2, name:'Tanathorn Charoenratanaporn', initials:'TC', lastMsg:'The client presentation is confirmed for 2 PM', time:'09:47', unread:0},
+  {id:3, name:'Tanatcha Devahastin', initials:'TD', lastMsg:"I've submitted the leave request, please approve when you can", time:'09:12', unread:1},
+  {id:4, name:'Sirikorn Nilkasap', initials:'SN', lastMsg:'Working from home today, available on Teams', time:'08:55', unread:0},
+  {id:5, name:'Zemin (泽民)', initials:'ZM', lastMsg:'今天下午的例会推迟到4点', time:'08:30', unread:3},
+  {id:6, name:'Zixuan (梓萱)', initials:'ZX', lastMsg:'The new module has been tested and is ready to deploy', time:'Yesterday', unread:0},
+  {id:7, name:'Zixuan (梓萱)', initials:'ZX', lastMsg:'请问您有空讨论一下这个方案吗？', time:'Yesterday', unread:1},
+  {id:8, name:'Yuxuan (宇轩)', initials:'YX', lastMsg:'技术文档已经上传到共享文件夹', time:'Yesterday', unread:0},
+  {id:9, name:'Yijun (毅君)', initials:'YJ', lastMsg:"When's the deadline for the Q2 report submission?", time:'Mon', unread:0},
+  {id:10, name:'Zimo (子墨)', initials:'ZM', lastMsg:'服务器已经恢复正常运行', time:'Mon', unread:0},
+  {id:11, name:'Jiayi (嘉懿)', initials:'JY', lastMsg:'The budget for the new project has been approved', time:'Mon', unread:0},
+  {id:12, name:'Meiling (美玲)', initials:'ML', lastMsg:'明天的培训会议请准时出席', time:'Sun', unread:0},
+  {id:13, name:'Haoran (浩然)', initials:'HR', lastMsg:'Team outing scheduled for next Friday', time:'Sun', unread:0},
+  {id:14, name:'Weicheng (伟诚)', initials:'WC', lastMsg:'请检查我发送的合同草稿并给出意见', time:'Sat', unread:0},
+];
+
+const CONVERSATIONS = {
+  0:[
+    {me:false,text:"สวัสดีค่ะ",time:"Today 10:12"},
+    {me:false,text:"Please complete the following task before end of day today. The link is below:",time:"Today 10:13"},
+    {me:false,text:"🔗 intranet.huawei.com/portal/task/TH-2026Q1-042",time:"Today 10:13"},
+    {me:false,text:"It is the Q1 Compliance Verification module. Please fill in all required sections and submit when done.",time:"Today 10:14"},
+    {me:true,text:"OK Krub. ขอบคุณครับ 🙏",time:"Today 10:31"},
+    {me:true,text:"Will complete it before 5 PM and submit.",time:"Today 10:31"},
+    {me:false,text:"Thank you! Please do not forget the documents in Section 3 as well.",time:"Today 10:45"},
+  ],
+  1:[
+    {me:false,text:"Hi! Did you get a chance to look at the new project proposal I sent over yesterday?",time:"Fri 14:22"},
+    {me:true,text:"Yes, I reviewed it this morning. There are a few sections that need some clarification.",time:"Fri 14:35"},
+    {me:false,text:"Sure, which sections specifically?",time:"Fri 14:37"},
+    {me:true,text:"Mainly the budget breakdown in section 2 and the delivery timeline in section 3. The numbers don't quite add up.",time:"Fri 14:40"},
+    {me:false,text:"Got it. I'll revise those sections and send you an updated version by end of day.",time:"Fri 14:45"},
+    {me:true,text:"I've just updated those sections and sent the file again. Please take another look when you have a moment.",time:"Today 09:10"},
+    {me:false,text:"Could you please send me the updated project timeline?",time:"Today 10:24"},
+  ],
+  2:[
+    {me:false,text:"The client called this afternoon regarding the Q2 presentation.",time:"Mon 16:00"},
+    {me:true,text:"Oh? What did they say?",time:"Mon 16:03"},
+    {me:false,text:"They originally wanted it on Wednesday but are requesting to move it to Thursday at 2 PM instead.",time:"Mon 16:05"},
+    {me:true,text:"Thursday at 2 PM works for me. Has the meeting room been booked?",time:"Mon 16:08"},
+    {me:false,text:"Yes, I've already reserved G-TOWER-F5-R1 for the presentation.",time:"Mon 16:12"},
+    {me:true,text:"Perfect. Can you also send the agenda to the client in advance?",time:"Today 08:45"},
+    {me:false,text:"The client presentation is confirmed for 2 PM",time:"Today 09:47"},
+  ],
+  3:[
+    {me:false,text:"Hello, I need to take a few days off next week for a personal matter.",time:"Today 07:50"},
+    {me:true,text:"Understood. Please submit the leave request through the HR system and I'll approve it.",time:"Today 08:20"},
+    {me:false,text:"Which leave type should I select? Annual leave or personal leave?",time:"Today 08:25"},
+    {me:true,text:"Since it's for personal reasons, select Personal Leave. If you run out of personal days, it will fall under Annual Leave.",time:"Today 08:30"},
+    {me:false,text:"Understood, thank you. I'll fill in the dates as Apr 13–14.",time:"Today 09:00"},
+    {me:false,text:"I've submitted the leave request, please approve when you can",time:"Today 09:12"},
+  ],
+  4:[
+    {me:false,text:"Good morning. Just a heads up that I'll be working from home today.",time:"Today 08:10"},
+    {me:true,text:"Noted. Do you have everything you need to work remotely?",time:"Today 08:20"},
+    {me:false,text:"Yes, I have VPN access and all the files I need.",time:"Today 08:30"},
+    {me:true,text:"Great. There's a team call at 3 PM today. Can you join via Teams?",time:"Today 08:45"},
+    {me:false,text:"Working from home today, available on Teams",time:"Today 08:55"},
+  ],
+  5:[
+    {me:false,text:"你好！下午的周例会议程已经发到你邮箱了，请查收。",time:"Today 07:45"},
+    {me:true,text:"好的，我看到了。第三项议题需要准备一下数据，我会在会议前准备好。",time:"Today 07:58"},
+    {me:false,text:"好的，另外关于昨天讨论的API接口问题，技术团队还在排查中。",time:"Today 08:10"},
+    {me:true,text:"预计什么时候能解决？客户那边已经催了好几次了。",time:"Today 08:15"},
+    {me:false,text:"今天下午的例会推迟到4点",time:"Today 08:30"},
+  ],
+  6:[
+    {me:false,text:"The build pipeline finished about an hour ago. All unit tests passed.",time:"Yesterday 16:00"},
+    {me:true,text:"That's great news. Any issues with the integration tests?",time:"Yesterday 16:10"},
+    {me:false,text:"One minor issue with the auth module, but I fixed it in commit 4a8f2c. It's clean now.",time:"Yesterday 16:20"},
+    {me:true,text:"Good work. I'll do a final review tonight and merge it to staging.",time:"Yesterday 16:30"},
+    {me:false,text:"The new module has been tested and is ready to deploy",time:"Yesterday 17:05"},
+  ],
+  7:[
+    {me:false,text:"您好，我整理了一个关于用户体验改进的新方案，想和您讨论一下。",time:"Yesterday 14:00"},
+    {me:true,text:"好的，方案的核心思路是什么？",time:"Yesterday 14:15"},
+    {me:false,text:"主要是优化首页的加载速度以及简化用户注册流程，预计可以提升转化率约15%。",time:"Yesterday 14:20"},
+    {me:true,text:"听起来不错。数据依据是哪里来的？",time:"Yesterday 14:28"},
+    {me:false,text:"基于上个季度的用户行为分析报告，具体数据在文档里都有说明。",time:"Yesterday 14:35"},
+    {me:false,text:"请问您有空讨论一下这个方案吗？",time:"Yesterday 15:02"},
+  ],
+  8:[
+    {me:false,text:"Hi, the API documentation update is complete. I've covered all the new endpoints from the last sprint.",time:"Yesterday 10:30"},
+    {me:true,text:"Thank you. Is the version history included?",time:"Yesterday 10:45"},
+    {me:false,text:"Yes, I've documented all breaking changes since v2.1 along with migration guides.",time:"Yesterday 11:00"},
+    {me:true,text:"Perfect. Please share the link in the team channel as well.",time:"Yesterday 11:10"},
+    {me:false,text:"技术文档已经上传到共享文件夹",time:"Yesterday 11:30"},
+  ],
+  9:[
+    {me:true,text:"Hi Yijun, can you take the lead on the Q2 data collection this month?",time:"Mon 13:00"},
+    {me:false,text:"Sure, I can do that. What format should the final report be in?",time:"Mon 13:15"},
+    {me:true,text:"Same as last quarter — Excel summary plus a PDF with the executive overview.",time:"Mon 13:20"},
+    {me:false,text:"Understood. I'll start gathering data from the sales and ops teams.",time:"Mon 13:25"},
+    {me:false,text:"When's the deadline for the Q2 report submission?",time:"Mon 14:10"},
+  ],
+  10:[
+    {me:false,text:"运维团队刚刚确认，数据库服务器的磁盘IO问题已经排查清楚了。",time:"Mon 09:00"},
+    {me:true,text:"具体是什么原因导致的？",time:"Mon 09:10"},
+    {me:false,text:"是备份任务的定时调度设置不当，和业务高峰期冲突了。现已修复并重新调度。",time:"Mon 09:15"},
+    {me:true,text:"好，这类问题以后要在非业务时间段进行备份。",time:"Mon 09:20"},
+    {me:false,text:"服务器已经恢复正常运行",time:"Mon 09:30"},
+  ],
+  11:[
+    {me:true,text:"Hi Jiayi, any updates on the budget approval for the new cloud infrastructure?",time:"Mon 10:00"},
+    {me:false,text:"I submitted the final cost breakdown to finance last Thursday. Still waiting on their sign-off.",time:"Mon 10:15"},
+    {me:true,text:"Do we have a target date? The DevOps team is on standby.",time:"Mon 10:20"},
+    {me:false,text:"Finance said they'd respond by end of this week at the latest.",time:"Mon 10:30"},
+    {me:false,text:"The budget for the new project has been approved",time:"Mon 11:45"},
+  ],
+  12:[
+    {me:false,text:"美玲好，下周三的新员工入职培训，你来负责IT系统部分，没问题吧？",time:"Sun 14:00"},
+    {me:true,text:"没问题，需要准备什么材料？",time:"Sun 14:10"},
+    {me:false,text:"主要是系统账户开通流程、VPN配置和内部工具使用说明。",time:"Sun 14:15"},
+    {me:true,text:"好的，我会提前准备好相关文档和演示环境。",time:"Sun 14:20"},
+    {me:false,text:"明天的培训会议请准时出席",time:"Sun 15:00"},
+  ],
+  13:[
+    {me:true,text:"Hi Haoran, are you organizing the team outing this quarter?",time:"Sun 11:00"},
+    {me:false,text:"Yes! I'm putting it together. We're thinking of doing a dinner and escape room activity.",time:"Sun 11:15"},
+    {me:true,text:"That sounds fun. How many people are we expecting?",time:"Sun 11:20"},
+    {me:false,text:"Around 18-20 people. I'll send a poll to confirm dietary preferences.",time:"Sun 11:30"},
+    {me:true,text:"Great. Do you need any help with reservations?",time:"Sun 11:35"},
+    {me:false,text:"Team outing scheduled for next Friday",time:"Sun 12:00"},
+  ],
+  14:[
+    {me:false,text:"您好，我发了一份合作合同草稿到您邮箱，麻烦有空帮我看一下。",time:"Sat 10:00"},
+    {me:true,text:"好的，主要看什么方面？",time:"Sat 10:20"},
+    {me:false,text:"主要是第四条关于违约责任的表述，还有第七条的保密期限，不太确定措辞是否准确。",time:"Sat 10:25"},
+    {me:true,text:"我看完后给你反馈，可能需要法务部门也过一遍。",time:"Sat 10:40"},
+    {me:false,text:"请检查我发送的合同草稿并给出意见",time:"Sat 11:00"},
+  ],
+};
+
+const MAILS = [
+  {
+    from:'hr.department@huawei.com', fromName:'HR Department', initials:'HR',
+    subject:'Annual Performance Review – Q1 2026',
+    time:'09:15', unread:true,
+    body:`Dear Employee,<br><br>
+We are pleased to inform you that the Q1 2026 Annual Performance Review cycle will commence on <strong>April 14, 2026</strong>. All employees are required to complete their self-assessment forms via the HR Portal no later than <strong>April 18, 2026</strong>.<br><br>
+Please ensure that you:<br>
+• Log in to the HR Portal and navigate to <em>Performance > Self Assessment</em><br>
+• Complete all sections including KPI achievements, competencies, and development goals<br>
+• Submit before the deadline to avoid any impact on your performance rating<br><br>
+Should you have any questions, please contact the HR Business Partner for your department.<br><br>
+Best regards,<br>HR Department<br>Huawei Technologies`
+  },
+  {
+    from:'zhang.wei@huawei.com', fromName:'Zhang Wei (张伟)', initials:'ZW',
+    subject:'关于Q1项目进度汇报',
+    time:'Yesterday', unread:true,
+    body:`您好，<br><br>
+请在<strong>本周五（4月10日）下班前</strong>提交Q1项目进度报告，具体要求如下：<br><br>
+1. 报告需涵盖已完成里程碑、当前进行中任务及下一阶段计划<br>
+2. 如有风险项目，请在报告中注明风险等级及应对措施<br>
+3. 格式请参照共享文件夹中的模板（路径：Team Docs > Templates > Q1_Progress_Report_Template.docx）<br><br>
+如有任何问题请及时与我联系。<br><br>
+谢谢配合，<br>张伟<br>项目管理部门<br>华为技术有限公司`
+  },
+  {
+    from:'it.helpdesk@huawei.com', fromName:'IT Helpdesk', initials:'IT',
+    subject:'Scheduled System Maintenance – April 10, 2026',
+    time:'Yesterday', unread:false,
+    body:`Dear All,<br><br>
+Please be advised that our internal IT systems will undergo <strong>scheduled maintenance</strong> on <strong>Saturday, April 10, 2026 from 22:00 to 02:00 (GMT+8)</strong>.<br><br>
+The following services will be temporarily unavailable during this period:<br>
+• Corporate email and calendar<br>
+• VPN remote access<br>
+• Internal collaboration portal<br>
+• File sharing servers<br><br>
+We recommend saving all work and logging off all corporate systems before 21:45 on Friday. Services will be restored by 02:00 Saturday at the latest.<br><br>
+We apologize for any inconvenience and appreciate your patience.<br><br>
+IT Helpdesk Team<br>Huawei Technologies`
+  },
+  {
+    from:'wang.fang@huawei.com', fromName:'Wang Fang (王芳)', initials:'WF',
+    subject:'会议室预约确认 – G-TOWER-F3-R2',
+    time:'Mon', unread:false,
+    body:`您好，<br><br>
+您的会议室预约已确认，详情如下：<br><br>
+<strong>地点：</strong>G-TOWER-F3-R2（第3层，第2会议室）<br>
+<strong>日期：</strong>2026年4月7日（星期二）<br>
+<strong>时间：</strong>14:00 – 16:00<br>
+<strong>容量：</strong>最多10人<br>
+<strong>设备：</strong>已配备投影仪、视频会议系统及白板<br><br>
+如需取消或修改预约，请于会议开始前24小时通过HR系统操作，或直接回复本邮件。<br><br>
+祝工作顺利，<br>王芳<br>行政服务部<br>华为技术有限公司`
+  },
+  {
+    from:'finance@huawei.com', fromName:'Finance Department', initials:'FN',
+    subject:'Q1 Expense Report Deadline Reminder',
+    time:'Mon', unread:false,
+    body:`Dear Team,<br><br>
+This is a reminder that the deadline for submitting your <strong>Q1 2026 expense reports</strong> is <strong>April 12, 2026</strong>.<br><br>
+Please ensure all receipts and claims are submitted through the Finance Portal under <em>Expenses > New Claim</em> before the deadline. Late submissions will be processed in the following month's cycle.<br><br>
+Key reminders:<br>
+• All receipts must be original or high-resolution scans<br>
+• Expenses above CNY 500 require a manager's pre-approval<br>
+• Entertainment expenses must include the names and company affiliations of all attendees<br><br>
+For assistance, contact the Finance helpline at ext. 8800.<br><br>
+Regards,<br>Finance Department<br>Huawei Technologies`
+  },
+  {
+    from:'li.hong@huawei.com', fromName:'Li Hong (李红)', initials:'LH',
+    subject:'员工福利政策更新通知',
+    time:'Mar 31', unread:false,
+    body:`尊敬的员工，<br><br>
+关于2026年度员工福利政策，公司人力资源部对以下内容作出了调整，请各位知悉：<br><br>
+<strong>1. 健康体检</strong><br>
+年度健康体检补贴由原2,000元调整为<strong>2,500元</strong>，适用于员工本人及直系家属（配偶及子女）。<br><br>
+<strong>2. 弹性工作</strong><br>
+经部门主管批准后，员工可申请每周最多2天的居家办公。<br><br>
+<strong>3. 带薪年假</strong>
+入职满5年的员工，年假天数由15天增至<strong>18天</strong>。<br><br>
+如需了解更多详情，请登录HR门户网站或联系您所在部门的HR业务伙伴。<br><br>
+祝好，<br>李红<br>人力资源部<br>华为技术有限公司`
+  },
+  {
+    from:'compliance@huawei.com', fromName:'Compliance Office', initials:'CO',
+    subject:'Mandatory: Code of Conduct Annual Training',
+    time:'Mar 28', unread:false,
+    body:`Dear All,<br><br>
+As part of our annual compliance requirement, <strong>all employees are required to complete the Code of Conduct Training</strong> by <strong>April 30, 2026</strong>.<br><br>
+This year's training covers:<br>
+• Anti-bribery and anti-corruption policies<br>
+• Data privacy and personal information protection<br>
+• Conflict of interest disclosure procedures<br>
+• Whistleblower protection and reporting channels<br><br>
+The training is available on the Learning Management System (LMS) under <em>Compliance > Mandatory Courses > 2026 Code of Conduct</em>. Estimated completion time is approximately 45 minutes.<br><br>
+Failure to complete the training by the deadline may affect your performance assessment. Please contact the Compliance Office if you experience any technical difficulties.<br><br>
+Compliance Office<br>Huawei Technologies`
+  },
+  {
+    from:'ceo.office@huawei.com', fromName:'CEO Office', initials:'CE',
+    subject:'Company Town Hall – April 15, 2026',
+    time:'Mar 26', unread:false,
+    body:`Dear Colleagues,<br><br>
+We are pleased to announce the <strong>Q1 2026 Company Town Hall Meeting</strong>, to be held on <strong>Wednesday, April 15, 2026 at 15:00 (GMT+8)</strong>.<br><br>
+The agenda will include:<br>
+• Q1 2026 Business Performance Review<br>
+• Strategic priorities for Q2 and H2 2026<br>
+• New product and market expansion updates<br>
+• Employee recognition awards<br>
+• Open Q&A session<br><br>
+The meeting will be streamed live via the internal broadcast platform. Employees in all offices are encouraged to join remotely. Conference rooms have been arranged in each building for group viewing.<br><br>
+We look forward to sharing our progress and hearing from all of you.<br><br>
+Office of the CEO<br>Huawei Technologies`
+  },
+  {
+    from:'chen.ming@huawei.com', fromName:'Chen Ming (陈明)', initials:'CM',
+    subject:'季度销售数据分析报告',
+    time:'Mar 25', unread:false,
+    body:`您好，<br><br>
+请查阅附件中的<strong>2026年Q1销售数据分析报告</strong>，并在下周一战略会议前做好相关准备。<br><br>
+本次报告主要结论如下：<br><br>
+• <strong>整体销售额</strong>同比增长14.3%，环比增长7.1%<br>
+• <strong>亚太区</strong>表现最为突出，完成目标的118%<br>
+• <strong>企业解决方案</strong>业务线增速最快，同比增长22.5%<br>
+• <strong>消费者业务</strong>受市场竞争影响，略低于目标5个百分点<br><br>
+如需获取原始数据或自定义分析，请联系数据分析团队（ext. 7720）。<br><br>
+此致，<br>陈明<br>销售战略部<br>华为技术有限公司`
+  },
+  {
+    from:'security@huawei.com', fromName:'IT Security', initials:'IS',
+    subject:'Action Required: Password Expiry in 7 Days',
+    time:'Mar 24', unread:false,
+    body:`Dear Employee,<br><br>
+This is an automated notification to inform you that your <strong>corporate network password will expire in 7 days</strong> (on April 2, 2026).<br><br>
+To update your password, please:<br>
+1. Press <strong>Ctrl + Alt + Delete</strong> on your workstation and select <em>Change a Password</em><br>
+2. Or visit the Self-Service Portal at <em>identity.huawei.com/selfservice</em><br><br>
+Password requirements:<br>
+• Minimum 12 characters<br>
+• Must include uppercase, lowercase, numbers, and special characters<br>
+• Cannot be the same as your last 10 passwords<br><br>
+If your password expires without renewal, your account will be locked and you will need to contact IT Security to restore access. Please update your password at the earliest convenience.<br><br>
+IT Security Team<br>Huawei Technologies`
+  },
+];
+
+// ══════════════════════════════════════════
+//  CHAT ENHANCEMENTS DATA
+// ══════════════════════════════════════════
+const ONLINE_IDS = new Set([0,1,3,5,6,8,11,13]);
+const LAST_SEEN = {2:'Last seen 1h ago',4:'Last seen 30m ago',7:'Last seen 3h ago',9:'Last seen 2h ago',10:'Last seen yesterday',12:'Last seen yesterday',14:'Last seen 4h ago'};
+const AUTO_REPLIES = {
+  0:"ค่ะ ขอบคุณนะคะ! Let me know once you have submitted. 🙏",
+  1:"Sure, I'll send that right away. Give me a moment.",
+  2:"Great, thanks for confirming. I'll prepare everything.",
+  3:"Thank you so much! Really appreciate it.",
+  4:"Perfect, I'll be on the call. See you then!",
+  5:"好的，收到了，谢谢！",
+  6:"Sounds good, thanks for checking in.",
+  7:"好的，期待您的回复！",
+  8:"Noted, thank you for the update.",
+  9:"Got it. I'll make sure to have it ready on time.",
+  10:"好的，明白了，谢谢！",
+  11:"Thanks! I'll follow up on that.",
+  12:"收到，谢谢提醒！",
+  13:"Awesome, looking forward to it!",
+  14:"好的，感谢！期待您的宝贵意见。",
+};
+
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+let currentTab = 'chat';
+let currentChatId = null;
+let idMode = 'card'; // 'card' | 'qr'
+let idTimer = null;
+let idCountdown = 30; // 30 seconds
+let currentMailIndex = null;
+
+// ══════════════════════════════════════════
+//  LOADING
+// ══════════════════════════════════════════
+function showLoading(cb, delay=650){
+  const el = document.getElementById('loading');
+  el.classList.remove('out','gone');
+  setTimeout(()=>{
+    if(cb) cb();
+    el.classList.add('out');
+    setTimeout(()=>el.classList.add('gone'), 300);
+  }, delay);
+}
+
+// ══════════════════════════════════════════
+//  LIVE CLOCK
+// ══════════════════════════════════════════
+function updateClock(){
+  const now = new Date();
+  const hms = now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const dateStr = now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const el = document.getElementById('live-time');
+  const de = document.getElementById('live-date');
+  if(el) el.textContent = hms;
+  if(de) de.textContent = dateStr;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ══════════════════════════════════════════
+//  BUILD CHAT LIST
+// ══════════════════════════════════════════
+function buildChatList(){
+  const container = document.getElementById('chat-list');
+  container.innerHTML = PEOPLE.map(p=>`
+    <div class="chat-item" onclick="openChatDetail(${p.id})">
+      <div class="avatar-wrap">
+        <img class="avatar" src="Profile${p.id}.jpg" alt="${p.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" loading="lazy">
+        <div class="avatar-fallback" style="display:none">${p.initials[0]}</div>
+        ${p.unread>0?`<div class="badge">${p.unread}</div>`:''}
+        <div class="${ONLINE_IDS.has(p.id)?'online-dot':'offline-dot'}"></div>
+      </div>
+      <div class="chat-info">
+        <div class="chat-name" style="${p.unread?'font-weight:800;':''}">${p.name}</div>
+        <div class="chat-preview" style="${p.unread?'color:#222;font-weight:500;':''}">${p.lastMsg}</div>
+      </div>
+      <div class="chat-time" style="${p.unread?'color:#CF082D;font-weight:700;':''}">${p.time}</div>
+    </div>
+  `).join('');
+}
+
+// ══════════════════════════════════════════
+//  CHAT DETAIL
+// ══════════════════════════════════════════
+function getDayLabel(t){
+  const d = t.split(' ')[0];
+  return {Mon:'Monday',Tue:'Tuesday',Wed:'Wednesday',Thu:'Thursday',Fri:'Friday',Sat:'Saturday',Sun:'Sunday',Today:'Today',Yesterday:'Yesterday'}[d] || d;
+}
+
+function openChatDetail(id){
+  currentChatId = id;
+  const p = PEOPLE.find(x=>x.id===id);
+  const msgs = CONVERSATIONS[id] || [];
+
+  // Header avatar
+  const avatarImg = document.getElementById('cd-avatar-img');
+  avatarImg.src = `Profile${id}.jpg`;
+  document.getElementById('cd-name').textContent = p.name;
+
+  // Online status
+  const statusEl = document.getElementById('cd-status');
+  if(ONLINE_IDS.has(id)){
+    statusEl.innerHTML = '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#34c759;"></span> Online';
+  } else {
+    statusEl.textContent = LAST_SEEN[id] || 'Offline';
+  }
+
+  // Messages with date separators + read receipts on my msgs
+  const box = document.getElementById('cd-messages');
+  let lastDay = null;
+  let html = '';
+  msgs.forEach(m=>{
+    const day = getDayLabel(m.time);
+    if(day !== lastDay){ html += `<div class="date-sep"><span>${day}</span></div>`; lastDay = day; }
+    const timeOnly = m.time.includes(' ') ? m.time.split(' ').slice(1).join(' ') : m.time;
+    if(m.me){
+      html += `<div class="msg me"><div class="msg-bubble">${m.text}</div><div class="msg-time">${timeOnly} <span class="msg-receipt read">✓✓</span></div></div>`;
+    } else {
+      html += `<div class="msg them"><div class="msg-bubble">${m.text}</div><div class="msg-time">${timeOnly}</div></div>`;
+    }
+  });
+  box.innerHTML = html;
+
+  // Clear unread badge
+  p.unread = 0;
+  buildChatList();
+
+  document.getElementById('chat-detail').classList.add('open');
+  setTimeout(()=>{ box.scrollTop = box.scrollHeight; },80);
+}
+
+function closeChatDetail(){
+  document.getElementById('chat-detail').classList.remove('open');
+  currentChatId = null;
+}
+
+function sendMsg(){
+  const input = document.getElementById('cd-input');
+  const text = input.value.trim();
+  if(!text || !currentChatId) return;
+  const box = document.getElementById('cd-messages');
+  const rid = 'r' + Date.now();
+
+  // Sent message with single tick
+  const div = document.createElement('div');
+  div.className = 'msg me';
+  div.innerHTML = `<div class="msg-bubble">${text}</div><div class="msg-time">Just now <span class="msg-receipt" id="${rid}">✓</span></div>`;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+  input.value = '';
+
+  // Double tick after 800ms
+  setTimeout(()=>{ const r=document.getElementById(rid); if(r) r.textContent='✓✓'; }, 800);
+  // Red = read after 2.2s
+  setTimeout(()=>{ const r=document.getElementById(rid); if(r){ r.textContent='✓✓'; r.classList.add('read'); } }, 2200);
+
+  // Typing indicator appears after 1.1s
+  setTimeout(()=>{
+    if(!document.getElementById('chat-detail').classList.contains('open')) return;
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'msg them'; typingDiv.id = 'typing-ind';
+    typingDiv.innerHTML = '<div class="typing-bubble"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
+    box.appendChild(typingDiv);
+    box.scrollTop = box.scrollHeight;
+
+    // Auto-reply after random 1.4–2.4s
+    const delay = 1400 + Math.random()*1000;
+    setTimeout(()=>{
+      const t = document.getElementById('typing-ind'); if(t) t.remove();
+      if(!document.getElementById('chat-detail').classList.contains('open')) return;
+      const reply = AUTO_REPLIES[currentChatId] || 'Noted.';
+      const replyDiv = document.createElement('div');
+      replyDiv.className = 'msg them';
+      replyDiv.innerHTML = `<div class="msg-bubble">${reply}</div><div class="msg-time">Just now</div>`;
+      box.appendChild(replyDiv);
+      box.scrollTop = box.scrollHeight;
+    }, delay);
+  }, 1100);
+}
+
+document.getElementById('cd-input').addEventListener('keydown',e=>{ if(e.key==='Enter') sendMsg(); });
+
+function popupCurrentPhoto(){
+  if(!currentChatId) return;
+  const p = PEOPLE.find(x=>x.id===currentChatId);
+  openImgPopup(`Profile${currentChatId}.jpg`, p.name);
+}
+
+// ══════════════════════════════════════════
+//  IMAGE POPUP
+// ══════════════════════════════════════════
+function openImgPopup(src, name){
+  document.getElementById('img-popup-img').src = src;
+  document.getElementById('img-popup-name').textContent = name;
+  document.getElementById('img-popup').classList.add('open');
+}
+function closeImgPopup(){
+  document.getElementById('img-popup').classList.remove('open');
+}
+
+// ══════════════════════════════════════════
+//  CLOCK IN/OUT
+// ══════════════════════════════════════════
+function doClockAction(){
+  document.getElementById('warn-popup').classList.add('open');
+}
+function closeWarn(){
+  document.getElementById('warn-popup').classList.remove('open');
+}
+
+// ══════════════════════════════════════════
+//  ID CARD
+// ══════════════════════════════════════════
+
+
+function updateRing(remaining){
+  const el = document.getElementById('id-countdown');
+  if(el) el.textContent = formatCountdown(remaining);
+}
+
+function switchID(mode){
+  if(mode === idMode) return;
+  const img = document.getElementById('id-img');
+
+  // Half-flip: spin to 90°, swap src, spin back
+  img.classList.add('flipping');
+  setTimeout(()=>{
+    idMode = mode;
+    img.src = mode==='card' ? 'CARD.JPG' : 'QR.JPG';
+    document.getElementById('id-btn-card').className = 'id-btn' + (mode==='card'?' active':'');
+    document.getElementById('id-btn-qr').className = 'id-btn' + (mode==='qr'?' active':'');
+    img.classList.remove('flipping');
+  }, 260);
+
+  if(idTimer) clearInterval(idTimer);
+  const timerDisplay = document.getElementById('id-timer-display');
+
+  if(mode==='qr'){
+    idCountdown = 30;
+    timerDisplay.style.display='flex';
+    updateRing(30);
+    idTimer = setInterval(()=>{
+      idCountdown--;
+      updateRing(idCountdown);
+      if(idCountdown<=0){
+        clearInterval(idTimer);
+        timerDisplay.style.display='none';
+        switchID('card');
+      }
+    },1000);
+  } else {
+    timerDisplay.style.display='none';
+  }
+}
+
+function formatCountdown(s){
+  return `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`;
+}
+
+// ══════════════════════════════════════════
+//  MAIL
+// ══════════════════════════════════════════
+function buildMailList(){
+  const container = document.getElementById('mail-list');
+  container.innerHTML = MAILS.map((m,i)=>`
+    <div class="mail-item" onclick="openMailDetail(${i})">
+      <div class="mail-avatar-circle" style="background:${mailColor(m.initials)}">${m.initials[0]}</div>
+      <div class="mail-info">
+        <div class="mail-from ${m.unread?'unread':''}">${m.fromName}</div>
+        <div class="mail-subject">${m.subject}</div>
+        <div class="mail-preview">${m.body.replace(/<[^>]+>/g,'').substring(0,60)}…</div>
+      </div>
+      <div class="mail-right">
+        <div class="mail-time">${m.time}</div>
+        ${m.unread?'<div class="mail-dot"></div>':''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function mailColor(initials){
+  const colors=['#1a1a1a','#2c3e50','#27ae60','#2980b9','#8e44ad','#c0392b','#16a085','#d35400'];
+  return colors[(initials.charCodeAt(0)+initials.charCodeAt(1||0))%colors.length];
+}
+
+function openMailDetail(i){
+  currentMailIndex = i;
+  const m = MAILS[i];
+  MAILS[i].unread = false;
+  document.getElementById('md-subject').textContent = m.subject;
+  document.getElementById('md-from-line').textContent = `From: ${m.from}`;
+  document.getElementById('md-sender-avatar').textContent = m.initials[0];
+  document.getElementById('md-sender-avatar').style.background = mailColor(m.initials);
+  document.getElementById('md-sender-name').textContent = m.fromName;
+  document.getElementById('md-sender-email').textContent = m.from;
+  document.getElementById('md-body').innerHTML = m.body;
+  document.getElementById('mail-detail').classList.add('open');
+  buildMailList();
+}
+
+function closeMailDetail(){
+  document.getElementById('mail-detail').classList.remove('open');
+}
+
+function openMC(){
+  document.getElementById('mail-compose').classList.add('open');
+  document.getElementById('mc-to').value='';
+  document.getElementById('mc-subj').value='';
+  document.getElementById('mc-body-input').value='';
+}
+function closeMC(){
+  document.getElementById('mail-compose').classList.remove('open');
+}
+function sendMC(){
+  const to = document.getElementById('mc-to').value.trim();
+  const subj = document.getElementById('mc-subj').value.trim();
+  if(!to||!subj){ showToast('Please fill in To and Subject fields'); return; }
+  closeMC();
+  showToast('Message sent successfully');
+}
+
+// ══════════════════════════════════════════
+//  HR
+// ══════════════════════════════════════════
+const HR_SHEETS = {
+  leave:{
+    title:'Leave Request',
+    fields:`
+      <div class="sheet-field"><label>Leave Type</label><select><option>Annual Leave</option><option>Sick Leave</option><option>Personal Leave</option><option>Maternity / Paternity Leave</option><option>Emergency Leave</option></select></div>
+      <div class="sheet-field"><label>Start Date</label><input type="date"></div>
+      <div class="sheet-field"><label>End Date</label><input type="date"></div>
+      <div class="sheet-field"><label>Reason (Optional)</label><textarea placeholder="Brief reason for leave request…"></textarea></div>
+      <div class="sheet-field"><label>Approving Manager</label><select><option>Direct Manager</option><option>Department Head</option></select></div>
+    `
+  },
+  room:{
+    title:'Reserve Meeting Room',
+    fields:`
+      <div class="sheet-field"><label>Building</label><select><option>G-TOWER</option></select></div>
+      <div class="sheet-field"><label>Floor</label><select>
+        ${[1,2,3,4,5,6,7,8,9,10].map(f=>`<option>F${f}</option>`).join('')}
+      </select></div>
+      <div class="sheet-field"><label>Room</label><select>
+        ${[1,2,3,4,5].map(r=>`<option>R${r}</option>`).join('')}
+      </select></div>
+      <div class="sheet-field"><label>Date</label><input type="date"></div>
+      <div class="sheet-field"><label>Start Time</label><input type="time"></div>
+      <div class="sheet-field"><label>End Time</label><input type="time"></div>
+      <div class="sheet-field"><label>Number of Attendees</label><input type="number" placeholder="e.g. 8" min="1" max="20"></div>
+      <div class="sheet-field"><label>Meeting Title</label><input type="text" placeholder="e.g. Q2 Strategy Review"></div>
+    `
+  },
+  overtime:{
+    title:'Overtime Request',
+    fields:`
+      <div class="sheet-field"><label>Date of Overtime</label><input type="date"></div>
+      <div class="sheet-field"><label>Start Time</label><input type="time"></div>
+      <div class="sheet-field"><label>End Time</label><input type="time"></div>
+      <div class="sheet-field"><label>Overtime Type</label><select><option>Weekday</option><option>Weekend</option><option>Public Holiday</option></select></div>
+      <div class="sheet-field"><label>Reason / Task Description</label><textarea placeholder="Describe the work performed during overtime…"></textarea></div>
+    `
+  },
+  payslip:{
+    title:'Pay Slip',
+    fields:`
+      <div class="sheet-field"><label>Select Month</label><select>
+        <option>March 2026</option><option>February 2026</option><option>January 2026</option>
+        <option>December 2025</option><option>November 2025</option><option>October 2025</option>
+      </select></div>
+      <div class="sheet-field" style="padding:16px 20px;"><div style="background:#f5f5f5;border-radius:10px;padding:14px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;"><span style="font-size:13px;color:#888;">Basic Salary</span><span style="font-size:13px;font-weight:600;">฿ 85,000</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;"><span style="font-size:13px;color:#888;">Allowances</span><span style="font-size:13px;font-weight:600;">฿ 12,500</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;"><span style="font-size:13px;color:#888;">Tax Deduction</span><span style="font-size:13px;font-weight:600;color:#CF082D;">- ฿ 8,200</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;"><span style="font-size:13px;color:#888;">Social Security</span><span style="font-size:13px;font-weight:600;color:#CF082D;">- ฿ 750</span></div>
+        <div style="height:1px;background:#e0e0e0;margin:8px 0;"></div>
+        <div style="display:flex;justify-content:space-between;"><span style="font-size:14px;font-weight:700;">Net Pay</span><span style="font-size:14px;font-weight:700;color:#CF082D;">฿ 88,550</span></div>
+      </div></div>
+    `
+  }
+};
+
+function openHRSheet(type){
+  const sheet = HR_SHEETS[type];
+  document.getElementById('hr-sheet-title').textContent = sheet.title;
+  document.getElementById('hr-sheet-body').innerHTML = sheet.fields;
+  document.getElementById('hr-sheet').classList.add('open');
+  if(type==='payslip'){
+    document.querySelector('#hr-sheet .sheet-submit').textContent = 'Download PDF';
+  } else {
+    document.querySelector('#hr-sheet .sheet-submit').textContent = 'Submit Request';
+  }
+}
+
+function closeHRSheet(){
+  document.getElementById('hr-sheet').classList.remove('open');
+}
+
+function submitHR(){
+  closeHRSheet();
+  showToast('Request submitted successfully');
+}
+
+// ══════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════
+let toastTimeout;
+function showToast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+// ══════════════════════════════════════════
+//  TAB NAVIGATION
+// ══════════════════════════════════════════
+const TAB_TITLES = {chat:'Chat',clock:'Attendance',id:'My ID Card',mail:'Mail',hr:'HR Portal'};
+const ACTIVE_SVGS = {
+  chat:`<svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="#CF082D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  clock:`<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#CF082D" stroke-width="1.8"/><path d="M12 7v5l3 3" stroke="#CF082D" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+  id:`<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="13" rx="2.5" stroke="#CF082D" stroke-width="1.8"/><circle cx="9" cy="12" r="2" stroke="#CF082D" stroke-width="1.5"/><path d="M14 10h4M14 13h3" stroke="#CF082D" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+  mail:`<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="#CF082D" stroke-width="1.8"/><path d="M3 8l9 6 9-6" stroke="#CF082D" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+  hr:`<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3" stroke="#CF082D" stroke-width="1.8"/><path d="M5 20c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="#CF082D" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+};
+const INACTIVE_SVGS = {
+  chat:`<svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  clock:`<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#999" stroke-width="1.8"/><path d="M12 7v5l3 3" stroke="#999" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+  id:`<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="13" rx="2.5" stroke="#999" stroke-width="1.8"/><circle cx="9" cy="12" r="2" stroke="#999" stroke-width="1.5"/><path d="M14 10h4M14 13h3" stroke="#999" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+  mail:`<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="#999" stroke-width="1.8"/><path d="M3 8l9 6 9-6" stroke="#999" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+  hr:`<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3" stroke="#999" stroke-width="1.8"/><path d="M5 20c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="#999" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+};
+
+function switchTab(tab){
+  if(tab === currentTab) return;
+
+  // Show loading
+  const loading = document.getElementById('loading');
+  loading.classList.remove('out','gone');
+
+  setTimeout(()=>{
+    // Update pages
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById(`page-${tab}`).classList.add('active');
+
+    // Update nav
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    const btn = document.getElementById(`nav-${tab}`);
+    btn.classList.add('active');
+    btn.querySelector('svg').outerHTML; // already handled inline
+    btn.innerHTML = `${ACTIVE_SVGS[tab]}<span>${TAB_TITLES[tab]}</span>`;
+
+    // Restore inactive navs
+    ['chat','clock','id','mail','hr'].filter(t=>t!==tab).forEach(t=>{
+      const b = document.getElementById(`nav-${t}`);
+      b.innerHTML = `${INACTIVE_SVGS[t]}<span>${TAB_TITLES[t]}</span>`;
+    });
+
+    // Header
+    document.getElementById('header-title').textContent = TAB_TITLES[tab];
+    document.getElementById('header-back').style.display = 'none';
+    document.getElementById('header-action').textContent = '';
+
+    // Compose FAB
+    document.getElementById('mail-compose-btn').style.display = tab==='mail' ? 'flex' : 'none';
+
+    currentTab = tab;
+
+    // Fade out loading
+    loading.classList.add('out');
+    setTimeout(()=>loading.classList.add('gone'), 320);
+  }, 600);
+}
+
+function headerBack(){
+  // For internal use if needed
+}
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+buildChatList();
+buildMailList();
+
+// Initial nav state
+document.getElementById('nav-chat').innerHTML = `${ACTIVE_SVGS['chat']}<span>Chat</span>`;
+
+// Register SW
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js').catch(()=>{});
+}
+
+// Initial loading hide
+showLoading(null, 900);
+</script>
+</body>
+</html>
