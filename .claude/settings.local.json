@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(ls /Users/karitsookpreedee/Desktop/All/FakeHW/Profile0* /Users/karitsookpreedee/Desktop/All/FakeHW/profile0*)",
-      "Bash(gh auth:*)"
-    ]
-  }
-}
