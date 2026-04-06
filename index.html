@@ -457,7 +457,8 @@ input,textarea,select,button{font-family:inherit;font-size:16px;touch-action:man
       Back
     </div>
     <div class="cd-avatar-wrap" id="cd-avatar-tap" onclick="popupCurrentPhoto()">
-      <img id="cd-avatar-img" class="cd-avatar" src="" alt="" onerror="this.style.display='none'">
+      <img id="cd-avatar-img" class="cd-avatar" src="" alt="" onerror="this.style.display='none';document.getElementById('cd-avatar-fallback').style.display='flex';">
+      <div id="cd-avatar-fallback" class="cd-avatar-fallback" style="display:none"></div>
     </div>
     <div id="cd-name-col">
       <div id="cd-name">Name</div>
@@ -930,6 +931,10 @@ function openChatDetail(id){
 
   // Header avatar
   const avatarImg = document.getElementById('cd-avatar-img');
+  const avatarFallback = document.getElementById('cd-avatar-fallback');
+  avatarImg.style.display = 'block';
+  avatarFallback.style.display = 'none';
+  avatarFallback.textContent = p.initials[0];
   avatarImg.src = `Profile${id}.jpg`;
   document.getElementById('cd-name').textContent = p.name;
 
